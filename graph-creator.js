@@ -119,7 +119,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     d3.select("#download-input").on("click", function(){
       var saveEdges = [];
       thisGraph.edges.forEach(function(val, i){
-        saveEdges.push({source: val.source.id, target: val.target.id});
+        saveEdges.push({source: val.source.id, target: val.target.id, attributes: val.attributes});
       });
       var blob = new Blob([window.JSON.stringify({"nodes": thisGraph.nodes, "edges": saveEdges})], {type: "text/plain;charset=utf-8"});
       saveAs(blob, "mydag.json");
@@ -255,6 +255,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       thisGraph.removeSelectFromEdge();
     }
     thisGraph.state.selectedEdge = edgeData;
+    document.getElementById('json-input').value = JSON.stringify(edgeData.attributes);
   };
 
   GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData){
@@ -372,7 +373,14 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
     if (mouseDownNode !== d){
       // we're in a different node: create new edge for mousedown edge and add to graph
-      var newEdge = {source: mouseDownNode, target: d};
+      var attributes = {};
+      try {
+        attributes = JSON.parse(document.getElementById("json-input").value);
+        console.log('Attributes: ' + JSON.stringify(attributes));
+      } catch(err) {
+        alert('Could not read JSON attributes');
+      }
+      var newEdge = {source: mouseDownNode, target: d, attributes: attributes};
       var filtRes = thisGraph.paths.filter(function(d){
         if (d.source === newEdge.target && d.target === newEdge.source){
           thisGraph.edges.splice(thisGraph.edges.indexOf(d), 1);
