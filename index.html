@@ -8,13 +8,49 @@
     <div id="graph">
     <div id="toolbox">
       <input type="file" id="hidden-file-upload"><input id="upload-input" type="image" title="upload graph" src="upload-icon.png" alt="upload graph"> <input type="image" id="download-input" title="download graph" src="download-icon.png" alt="download graph"> <input type="image" id="delete-graph" title="delete graph" src="trash-icon.png" alt="delete graph">
-      <textarea id="json-input"></textarea>
+    </div>
+    <div id="forms">
+      <div id="node-form" style="display: none">
+        <form>
+          Url: <input type="text" id="Url" value=""><br>
+          HttpStatus:
+          <select id="HttpStatusCode">
+            <option value="200">200</option>
+            <option value="100">100</option>
+            <option value="300">300</option>
+            <option value="400">400</option>
+            <option value="500">500</option>
+            <option value="000">Not Crawled</option>
+          </select><br>
+          AnchorSize: <input type="text" id="AnchorSize" value="Random(1~999)"><br>
+          Title: <input type="text" id="Title" value="Welcome to Url"><br><br>
+          <!-- <button type="button" name="SaveUrl">Save Url</button> -->
+        </form>
+      </div>
+
+      <div id="edge-form" style="display: none">
+        <form>
+          <button type="button" name="AddLink">Add Link</button>
+          <button type="button" name="DeleteLink">Del Link</button><br>
+          <select name="UrlLinks" size="3" style="width: 236px; ">
+              <option>Link1</option>
+              <option>Link2</option>
+              <option>Link3</option>  
+          </select><br>
+          AnchorText: <input type="text" name="AnchorText" value="AnchorText for this link" style="width: 150px; "><br>
+          LinkAttributes: <br>
+          <input type="checkbox" name="SameSubDomain">SAME_SUBDOMAIN<br>
+          <input type="checkbox" name="SameDomain">SAME_DOMAIN<br>
+          <input type="checkbox" name="NoFollow">NOFOLLOW<br>
+        </form>
+      </div>
     </div>
     </div>
 
     <script src="//d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="//cdn.jsdelivr.net/filesaver.js/0.1/FileSaver.min.js"></script>
     <script src="graph-creator.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.js"></script>
   </body>
 
 </html>

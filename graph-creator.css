@@ -96,3 +96,9 @@ path.link.hidden{
 path.link.selected {
     stroke: rgb(229, 172, 247);
 }
+
+#node-form, #edge-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+}

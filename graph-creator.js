@@ -255,7 +255,8 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       thisGraph.removeSelectFromEdge();
     }
     thisGraph.state.selectedEdge = edgeData;
-    document.getElementById('json-input').value = JSON.stringify(edgeData.attributes);
+    $('#edge-form').show();
+    //document.getElementById('json-input').value = JSON.stringify(edgeData.attributes);
   };
 
   GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData){
@@ -265,6 +266,11 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       thisGraph.removeSelectFromNode();
     }
     thisGraph.state.selectedNode = nodeData;
+    $('#node-form').show();
+    $("#Url").val(nodeData.title);
+    $("#HttpStatusCode").val(nodeData.status);
+    $("#AnchorSize").val(nodeData.anchor);
+    $("#Title").val(nodeData.title2);
   };
 
   GraphCreator.prototype.removeSelectFromNode = function(){
@@ -272,7 +278,14 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     thisGraph.circles.filter(function(cd){
       return cd.id === thisGraph.state.selectedNode.id;
     }).classed(thisGraph.consts.selectedClass, false);
+    $.extend(thisGraph.state.selectedNode, {
+      url: $("#Url").val(),
+      status: $("#HttpStatusCode").val(),
+      anchor: $("#AnchorSize").val(),
+      title2: $("#Title").val()
+    });
     thisGraph.state.selectedNode = null;
+    $('#node-form').hide();
   };
 
   GraphCreator.prototype.removeSelectFromEdge = function(){
@@ -281,6 +294,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       return cd === thisGraph.state.selectedEdge;
     }).classed(thisGraph.consts.selectedClass, false);
     thisGraph.state.selectedEdge = null;
+    $('#edge-form').hide();
   };
 
   GraphCreator.prototype.pathMouseDown = function(d3path, d){
@@ -374,12 +388,12 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     if (mouseDownNode !== d){
       // we're in a different node: create new edge for mousedown edge and add to graph
       var attributes = {};
-      try {
-        attributes = JSON.parse(document.getElementById("json-input").value);
-        console.log('Attributes: ' + JSON.stringify(attributes));
-      } catch(err) {
-        alert('Could not read JSON attributes');
-      }
+      // try {
+      //   JSON.parse(document.getElementById("json-input").value);
+      //   console.log('Attributes: ' + JSON.stringify(attributes));
+      // } catch(err) {
+      //   alert('Could not read JSON attributes');
+      // }
       var newEdge = {source: mouseDownNode, target: d, attributes: attributes};
       var filtRes = thisGraph.paths.filter(function(d){
         if (d.source === newEdge.target && d.target === newEdge.source){
@@ -437,9 +451,20 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       state.justScaleTransGraph = false;
     } else if (state.graphMouseDown && d3.event.shiftKey){
       // clicked not dragged from svg
-      var xycoords = d3.mouse(thisGraph.svgG.node()),
-          d = {id: thisGraph.idct++, title: consts.defaultTitle, x: xycoords[0], y: xycoords[1]};
+      var xycoords = d3.mouse(thisGraph.svgG.node());
+      var d = {
+        id: thisGraph.idct++,
+        title: $("#Url").val(),
+        x: xycoords[0],
+        y: xycoords[1],
+        url: $("#Url").val(),
+        status: $("#HttpStatusCode").val(),
+        anchor: $("#AnchorSize").val(),
+        title2: $("#Title").val()
+      };
       thisGraph.nodes.push(d);
+      console.log("Creating node");
+
       thisGraph.updateGraph();
       // make title of text immediently editable
       var d3txt = thisGraph.changeTextOfNode(thisGraph.circles.filter(function(dval){
