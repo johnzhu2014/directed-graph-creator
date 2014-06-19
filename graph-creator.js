@@ -170,6 +170,15 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
     d3.select("#DeleteLink").on("click", function() {
       $("#UrlLinks").find(":selected").remove();
+
+      var links = [];
+      for (var i=0; i<document.getElementById("UrlLinks").options.length; i++) {
+        links.push(document.getElementById("UrlLinks").options[i].value);
+      }
+      $.extend(thisGraph.state.selectedEdge, {
+        attributes: JSON.stringify(links)
+      });
+
     });
 
     d3.select("#AddLink").on("click", function() {
@@ -182,6 +191,14 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
       document.getElementById("AnchorText").value = thisGraph.createDefaultLinkAnchorText(thisGraph.state.selectedEdge.source.title, thisGraph.state.selectedEdge.target.title);  
       thisGraph.createDefaultLinkAttributes(thisGraph.state.selectedEdge.source.title, thisGraph.state.selectedEdge.target.title);
+
+      var links = [];
+      for (var i=0; i<document.getElementById("UrlLinks").options.length; i++) {
+        links.push(document.getElementById("UrlLinks").options[i].value);
+      }
+      $.extend(thisGraph.state.selectedEdge, {
+        attributes: JSON.stringify(links)
+      });
     });
   };
 
@@ -367,13 +384,19 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       return cd === thisGraph.state.selectedEdge;
     }).classed(thisGraph.consts.selectedClass, false);
     console.log("remove");
-    var links = [];
-    for (var i=0; i<document.getElementById("UrlLinks").options.length; i++) {
-      links.push(document.getElementById("UrlLinks").options[i].value);
-    }
-    $.extend(thisGraph.state.selectedEdge, {
-      attributes: JSON.stringify(links)
-    });
+    if(thisGraph.state.selectedEdge)
+    {
+      console.log("update edge attributes");
+    
+      var links = [];
+      for (var i=0; i<document.getElementById("UrlLinks").options.length; i++) {
+        links.push(document.getElementById("UrlLinks").options[i].value);
+      }
+      $.extend(thisGraph.state.selectedEdge, {
+        attributes: JSON.stringify(links)
+      });
+    }  
+    
     thisGraph.state.selectedEdge = null;
     $('#edge-form').hide();
   };
@@ -479,6 +502,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       });
       if (!filtRes[0].length){
         thisGraph.edges.push(newEdge);
+        thisGraph.state.selectedEdge = null;
         thisGraph.updateGraph();
       }
     } else{
