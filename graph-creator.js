@@ -182,8 +182,14 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     });
 
     d3.select("#AddLink").on("click", function() {
+      var linkVal = {};
+      linkVal["AnchorText"] = $("#AnchorText").val();
+      linkVal["SameSubDomain"] = document.getElementById("LA_SameSubDomain").checked;
+      linkVal["SameDomain"] = document.getElementById("LA_SameDomain").checked;
+      linkVal["NoFollow"] = document.getElementById("LA_NoFollow").checked;
+
       $("#UrlLinks").append($("<option></option>")
-         .text($("#AnchorText").val())); 
+         .text(JSON.stringify(linkVal))); 
 
       document.getElementById("LA_SameSubDomain").checked = false;
       document.getElementById("LA_SameDomain").checked = false;
@@ -357,10 +363,10 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     }
     thisGraph.state.selectedNode = nodeData;
     $('#node-form').show();
-    $("#Url").val(nodeData.title);
-    $("#HttpStatusCode").val(nodeData.status);
-    $("#AnchorSize").val(nodeData.anchor);
-    $("#Title").val(nodeData.title2);
+    $("#Title").val(nodeData.title);
+    $("#HttpStatusCode").val(nodeData.httpstatus);
+    $("#AnchorSize").val(Math.floor(Math.random() * 999) + 1);
+    $("#Description").val("welcome to " + nodeData.title);
   };
 
   GraphCreator.prototype.removeSelectFromNode = function(){
@@ -369,10 +375,10 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       return cd.id === thisGraph.state.selectedNode.id;
     }).classed(thisGraph.consts.selectedClass, false);
     $.extend(thisGraph.state.selectedNode, {
-      url: $("#Url").val(),
-      status: $("#HttpStatusCode").val(),
-      anchor: $("#AnchorSize").val(),
-      title2: $("#Title").val()
+      title: $("#Title").val(),
+      httpstatus: $("#HttpStatusCode").val(),
+      anchorsize: $("#AnchorSize").val(),
+      description: $("#Description").val()
     });
     thisGraph.state.selectedNode = null;
     $('#node-form').hide();
@@ -554,13 +560,12 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       var xycoords = d3.mouse(thisGraph.svgG.node());
       var d = {
         id: thisGraph.idct++,
-        title: $("#Url").val(),
+        title: $("#Title").val(),
         x: xycoords[0],
         y: xycoords[1],
-        url: $("#Url").val(),
-        status: $("#HttpStatusCode").val(),
-        anchor: $("#AnchorSize").val(),
-        title2: $("#Title").val()
+        httpstatus: $("#HttpStatusCode").val(),
+        anchorsize: $("#AnchorSize").val(),
+        description: $("#Description").val()
       };
       thisGraph.nodes.push(d);
       console.log("Creating node");
