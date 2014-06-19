@@ -22,26 +22,23 @@
             <option value="500">500</option>
             <option value="000">Not Crawled</option>
           </select><br>
-          AnchorSize: <input type="text" id="AnchorSize" value="Random(1~999)"><br>
-          Title: <input type="text" id="Title" value="Welcome to Url"><br><br>
+          AnchorSize: <input type="text" id="AnchorSize" value="1"><br>
+          Title: <input type="text" id="Title" value="welcome to url"><br><br>
           <!-- <button type="button" name="SaveUrl">Save Url</button> -->
         </form>
       </div>
 
       <div id="edge-form" style="display: none">
         <form>
-          <button type="button" name="AddLink">Add Link</button>
-          <button type="button" name="DeleteLink">Del Link</button><br>
-          <select name="UrlLinks" size="3" style="width: 236px; ">
-              <option>Link1</option>
-              <option>Link2</option>
-              <option>Link3</option>  
+          <button type="button" id="AddLink">Add Link</button>
+          <button type="button" id="DeleteLink">Del Link</button><br>
+          <select id="UrlLinks" size="10" style="width: 236px; ">
           </select><br>
-          AnchorText: <input type="text" name="AnchorText" value="AnchorText for this link" style="width: 150px; "><br>
+          AnchorText: <input type="text" id="AnchorText" value="" style="width: 150px; "><br>
           LinkAttributes: <br>
-          <input type="checkbox" name="SameSubDomain">SAME_SUBDOMAIN<br>
-          <input type="checkbox" name="SameDomain">SAME_DOMAIN<br>
-          <input type="checkbox" name="NoFollow">NOFOLLOW<br>
+          <input type="checkbox" id="LA_SameSubDomain">SAME_SUBDOMAIN<br>
+          <input type="checkbox" id="LA_SameDomain">SAME_DOMAIN<br>
+          <input type="checkbox" id="LA_NoFollow">NOFOLLOW<br>
         </form>
       </div>
     </div>

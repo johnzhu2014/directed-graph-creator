@@ -167,6 +167,65 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     d3.select("#delete-graph").on("click", function(){
       thisGraph.deleteGraph(false);
     });
+
+    d3.select("#DeleteLink").on("click", function() {
+      $("#UrlLinks").find(":selected").remove();
+    });
+
+    d3.select("#AddLink").on("click", function() {
+      $("#UrlLinks").append($("<option></option>")
+         .text($("#AnchorText").val())); 
+
+      document.getElementById("LA_SameSubDomain").checked = false;
+      document.getElementById("LA_SameDomain").checked = false;
+      document.getElementById("LA_NoFollow").checked = false;
+
+      document.getElementById("AnchorText").value = thisGraph.createDefaultLinkAnchorText(thisGraph.state.selectedEdge.source.title, thisGraph.state.selectedEdge.target.title);  
+      thisGraph.createDefaultLinkAttributes(thisGraph.state.selectedEdge.source.title, thisGraph.state.selectedEdge.target.title);
+    });
+  };
+
+  GraphCreator.prototype.createDefaultLinkAnchorText = function (sourceUrl, targetUrl) {
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      for( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      return sourceUrl + "->" + targetUrl + ":" + text;
+  };
+
+  GraphCreator.prototype.getSubDomain = function (url) {
+      var prefix = /^https?:\/\//i;
+      var domain = /^[^\/]+/;
+      url = url.replace(prefix, "");
+      var match = url.match(domain);
+      if(match)
+        return match[0];
+      else
+        return "";
+  }
+
+  GraphCreator.prototype.createDefaultLinkAttributes = function (sourceUrl, targetUrl) {
+      var thisGraph = this;
+      var sourceSubDomain = thisGraph.getSubDomain(sourceUrl);
+      var targetSubDomain = thisGraph.getSubDomain(targetUrl);
+
+      //console.log(sourceSubDomain);
+      //console.log(targetSubDomain);
+
+      if(sourceSubDomain && targetSubDomain && sourceSubDomain == targetSubDomain)
+        document.getElementById("LA_SameSubDomain").checked = true;
+
+      var sourceArray = sourceSubDomain.split(".");
+      var targetArray = targetSubDomain.split(".");  
+
+      if(sourceArray.length < 2 || targetArray.length < 2)
+        return;
+
+      if(sourceArray[sourceArray.length-1] == targetArray[targetArray.length-1] && sourceArray[sourceArray.length-2] == targetArray[targetArray.length-2])
+      {
+        //console.log("set same domain");
+        document.getElementById("LA_SameDomain").checked = true;
+      }
   };
 
   GraphCreator.prototype.setIdCt = function(idct){
@@ -256,7 +315,21 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     }
     thisGraph.state.selectedEdge = edgeData;
     $('#edge-form').show();
-    //document.getElementById('json-input').value = JSON.stringify(edgeData.attributes);
+    document.getElementById('UrlLinks').options.length = 0;
+    if (edgeData.attributes && edgeData.attributes.length > 0) {
+      console.log("parse from " + JSON.parse(edgeData.attributes));
+      $.each(JSON.parse(edgeData.attributes), function(key, value) {   
+        $('#UrlLinks')
+             .append($("<option></option>")
+             .text(value)); 
+      });  
+    }
+
+    document.getElementById("LA_SameSubDomain").checked = false;
+    document.getElementById("LA_SameDomain").checked = false;
+    document.getElementById("LA_NoFollow").checked = false;
+    document.getElementById("AnchorText").value = thisGraph.createDefaultLinkAnchorText(edgeData.source.title, edgeData.target.title);
+    thisGraph.createDefaultLinkAttributes(edgeData.source.title, edgeData.target.title);
   };
 
   GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData){
@@ -293,6 +366,14 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     thisGraph.paths.filter(function(cd){
       return cd === thisGraph.state.selectedEdge;
     }).classed(thisGraph.consts.selectedClass, false);
+    console.log("remove");
+    var links = [];
+    for (var i=0; i<document.getElementById("UrlLinks").options.length; i++) {
+      links.push(document.getElementById("UrlLinks").options[i].value);
+    }
+    $.extend(thisGraph.state.selectedEdge, {
+      attributes: JSON.stringify(links)
+    });
     thisGraph.state.selectedEdge = null;
     $('#edge-form').hide();
   };
@@ -387,14 +468,9 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
     if (mouseDownNode !== d){
       // we're in a different node: create new edge for mousedown edge and add to graph
-      var attributes = {};
-      // try {
-      //   JSON.parse(document.getElementById("json-input").value);
-      //   console.log('Attributes: ' + JSON.stringify(attributes));
-      // } catch(err) {
-      //   alert('Could not read JSON attributes');
-      // }
-      var newEdge = {source: mouseDownNode, target: d, attributes: attributes};
+      document.getElementById("UrlLinks").options.length = 0;
+      console.log("new edge");
+      var newEdge = {source: mouseDownNode, target: d, attributes: ""};
       var filtRes = thisGraph.paths.filter(function(d){
         if (d.source === newEdge.target && d.target === newEdge.source){
           thisGraph.edges.splice(thisGraph.edges.indexOf(d), 1);
